@@ -1,0 +1,49 @@
+﻿@page "/usuarios"
+@inject AppDbContext Db
+
+<h1>Usuarios</h1>
+
+<input placeholder="Nombre" @bind="nuevoUsuario.Nombre" />
+<input placeholder="Correo" @bind="nuevoUsuario.Correo" />
+<input placeholder="Contraseña" @bind="nuevoUsuario.Contraseña" />
+<select @bind="nuevoUsuario.Rol">
+    <option>Estudiante</option>
+    <option>Maestro</option>
+    <option>Admin</option>
+</select>
+<button @onclick="AgregarUsuario">Agregar</button>
+
+<table>
+    <thead>
+        <tr><th>Nombre</th><th>Correo</th><th>Rol</th></tr>
+    </thead>
+    <tbody>
+        @foreach (var u in usuarios)
+        {
+            <tr>
+                <td>@u.Nombre</td>
+                <td>@u.Correo</td>
+                <td>@u.Rol</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    List<Usuario> usuarios = new();
+    Usuario nuevoUsuario = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        usuarios = await Db.Usuarios.ToListAsync();
+    }
+
+    async Task AgregarUsuario()
+    {
+        Db.Usuarios.Add(nuevoUsuario);
+        await Db.SaveChangesAsync();
+
+        nuevoUsuario = new();
+        usuarios = await Db.Usuarios.ToListAsync();
+    }
+}
